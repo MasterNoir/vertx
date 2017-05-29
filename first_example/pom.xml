@@ -30,7 +30,7 @@
 
   <dependencies>
   
-  <dependency>
+  	<dependency>
 	  <groupId>io.vertx</groupId>
 	  <artifactId>vertx-core</artifactId>
 	  <version>3.4.1</version>
@@ -46,6 +46,12 @@
     <dependency>
 	  <groupId>io.vertx</groupId>
 	  <artifactId>vertx-hazelcast</artifactId>
+	  <version>3.4.1</version>
+	</dependency>
+	
+	<dependency>
+	  <groupId>io.vertx</groupId>
+	  <artifactId>vertx-mysql-postgresql-client</artifactId>
 	  <version>3.4.1</version>
 	</dependency>
 
