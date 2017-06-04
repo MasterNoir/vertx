@@ -72,7 +72,7 @@ public class Client extends AbstractVerticle implements ActionListener{
         subButton.addActionListener(this);
         panel2.add(subButton);
         
-        clearButton = new JButton("Clear Tabley");
+        clearButton = new JButton("Clear Table");
         clearButton.addActionListener(this);
         panel2.add(clearButton);
         

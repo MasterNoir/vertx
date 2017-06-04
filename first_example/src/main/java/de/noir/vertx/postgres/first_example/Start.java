@@ -68,38 +68,58 @@ public class Start implements ActionListener{
     	
     	// Erstellt eine Config-Variable
     	Config hazelcastConfig = new Config();
-    	// Aktiviert TcpIp und bestimmt die Adressen.
-        //hazelcastConfig.getNetworkConfig().getJoin().getTcpIpConfig().addMember("192.168.2.112").setEnabled(true);
-    	hazelcastConfig.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(true);
-        // Deaktiviert Multicast.
-        hazelcastConfig.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
-        
-        // Verbindet die Config mit dem Hazelcast-ClusterManager
-        ClusterManager mgr = new HazelcastClusterManager(hazelcastConfig);
-        
-        // Setzt die Vertx-Optionen auf Cluster-Modus und verwendet den konfigurierten Hazelcast-CM. 
-    	//VertxOptions options = new VertxOptions().setClustered(true).setClusterManager(mgr).setClusterHost("192.168.178.52");
-    	VertxOptions options = new VertxOptions().setClustered(true).setClusterManager(mgr).setClusterHost("192.168.2.118");
     	
-    	Vertx.clusteredVertx(options, res -> {
-    		
-    		cFrame.dispose();
-    		
-            if (res.succeeded()) {
-              Vertx vertx = res.result();
               
-              if(ae.getSource() == this.serverButton){
-            	  vertx.deployVerticle(new Server());
-              }else if(ae.getSource() == this.clientButton){
-            	  vertx.deployVerticle(new Client());
+              if(ae.getSource() == this.clientButton){
+            	  
+            	  hazelcastConfig.getNetworkConfig().getJoin().getTcpIpConfig().addMember("192.168.2.118").setEnabled(true);
+                  // Deaktiviert Multicast.
+                  hazelcastConfig.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
+                  
+                  // Verbindet die Config mit dem Hazelcast-ClusterManager
+                  ClusterManager mgr = new HazelcastClusterManager(hazelcastConfig);
+                  
+                  VertxOptions options = new VertxOptions().setClustered(true).setClusterManager(mgr).setClusterHost("192.168.2.112");
+                  
+                  
+                  Vertx.clusteredVertx(options, res -> {
+              		
+              		cFrame.dispose();
+              		
+                      if (res.succeeded()) {
+                        Vertx vertx = res.result();
+                        vertx.deployVerticle(new Client());
+                      }
+                      else {
+                          System.out.println("Clustered Vertx failed!");
+                      }
+                  });
+              }else if(ae.getSource() == this.serverButton){
+            	  
+            	  hazelcastConfig.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(true);
+                  // Deaktiviert Multicast.
+                  hazelcastConfig.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
+                  
+                  // Verbindet die Config mit dem Hazelcast-ClusterManager
+                  ClusterManager mgr = new HazelcastClusterManager(hazelcastConfig);
+
+                  
+                  VertxOptions options = new VertxOptions().setClustered(true).setClusterManager(mgr).setClusterHost("192.168.2.118");
+                  
+                  Vertx.clusteredVertx(options, res -> {
+              		
+              		cFrame.dispose();
+              		
+                      if (res.succeeded()) {
+                        Vertx vertx = res.result();
+                        vertx.deployVerticle(new Server());
+                      }
+                      else {
+                          System.out.println("Clustered Vertx failed!");
+                      }
+                  });
               }
               
-            } else {
-              System.out.println("Clustered Vertx failed!");
-            }
-          });
-    	
-    	
     }
 
 }
