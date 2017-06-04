@@ -8,6 +8,8 @@ import io.vertx.ext.asyncsql.PostgreSQLClient;
 import io.vertx.ext.sql.SQLConnection;
 
 public class Server extends AbstractVerticle{
+	
+	SQLConnection connection;
 
 	public void start(Future<Void> future){
 		
@@ -18,14 +20,18 @@ public class Server extends AbstractVerticle{
         });
 		
 		vertx.eventBus().consumer("getValue", message -> {
-            
+            getValue(message.body().toString());
+        });
+		
+		vertx.eventBus().consumer("clearTable", message -> {
+            clearTable();
         });
 		
 		JsonObject postgreSQLClientConfig = new JsonObject().put("host", "localhost");
+		postgreSQLClientConfig.put("port", 5432);
 		postgreSQLClientConfig.put("username", "postgres");
 		postgreSQLClientConfig.put("password", "postgres");
-		postgreSQLClientConfig.put("port", "5432");
-		postgreSQLClientConfig.put("database", "");
+		postgreSQLClientConfig.put("database", "vertx_database");
 		
 		AsyncSQLClient postgreSQLClient = PostgreSQLClient.createShared(vertx, postgreSQLClientConfig);
 		
@@ -33,12 +39,10 @@ public class Server extends AbstractVerticle{
 		postgreSQLClient.getConnection(res -> {
 					  if (res.succeeded()) {
 			
-					    SQLConnection connection = res.result();
-			
-					    // Got a connection
+						connection = res.result();						
 			
 					  } else {
-					    // Failed to get connection - deal with it
+						  System.out.println("Connection failed!");
 					  }
 				});
 		
@@ -46,11 +50,24 @@ public class Server extends AbstractVerticle{
 	}
 	
 	public void setKeyValue(String key, String value){
-		
+		connection.query("INSERT INTO dictionary VALUES('" + key + "', '" + value + "')", arg1 -> {
+	    	System.out.println("New key:   " + key);
+	    	System.out.println("New value: " + value);
+	    });
 	}
 	
 	public void getValue(String key){
-		
-		vertx.eventBus().publish("resultToClient", "qqq");
+
+		connection.query("SELECT value FROM dictionary WHERE  key = '" + key + "'", arg1 -> {
+	    	System.out.println("Queried key:    " + key);
+	    	System.out.println("Returned value: " + arg1.result().getResults().get(0).getString(0));
+	    	vertx.eventBus().publish("resultToClient", arg1.result().getResults().get(0).getString(0));
+	    });
+	}
+	
+	public void clearTable(){
+		connection.query("DELETE FROM dictionary", arg1 -> {
+			System.out.println("Table cleared!");
+		});
 	}
 }

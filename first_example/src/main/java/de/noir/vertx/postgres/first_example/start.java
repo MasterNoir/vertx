@@ -3,6 +3,7 @@ package de.noir.vertx.postgres.first_example;
 import com.hazelcast.config.Config;
 
 import de.noir.vertx.postgres.first_example.client.Client;
+import de.noir.vertx.postgres.first_example.server.Server;
 
 //import org.jruby.javasupport.ext.JavaUtilRegex.Matcher;
 
@@ -33,7 +34,8 @@ public class start {
         ClusterManager mgr = new HazelcastClusterManager(hazelcastConfig);
         
         // Setzt die Vertx-Optionen auf Cluster-Modus und verwendet den konfigurierten Hazelcast-CM. 
-    	VertxOptions options = new VertxOptions().setClustered(true).setClusterManager(mgr).setClusterHost("192.168.178.52");
+    	//VertxOptions options = new VertxOptions().setClustered(true).setClusterManager(mgr).setClusterHost("192.168.178.52");
+    	VertxOptions options = new VertxOptions().setClustered(true).setClusterManager(mgr).setClusterHost("192.168.2.118");
     	
     	// Erzeugt eine Vert.x-Instanz.
         Vertx.clusteredVertx(options, res -> {
@@ -41,7 +43,8 @@ public class start {
             Vertx vertx = res.result();
             
             // Erzeugt einen Receiver-Verticle.
-            vertx.deployVerticle(new Client());
+            //vertx.deployVerticle(new Client());
+            vertx.deployVerticle(new Server());
             
           } else {
             // failed!
