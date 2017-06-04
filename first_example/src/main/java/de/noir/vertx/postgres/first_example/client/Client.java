@@ -21,6 +21,7 @@ public class Client extends AbstractVerticle implements ActionListener{
     
 	JFrame cFrame;
 	JButton subButton;
+	JButton clearButton;
 	JButton searchButton;
 	GridLayout experimentLayout;
 	JTextField key;
@@ -36,7 +37,6 @@ public class Client extends AbstractVerticle implements ActionListener{
                
         initGUI();
         
-	     
 	    future.complete();
     }
     
@@ -62,8 +62,8 @@ public class Client extends AbstractVerticle implements ActionListener{
         JLabel label1 = new JLabel("Database entry:");
         panel1.add(label1);
  
-        key = new JTextField("Key", 15);
-        value = new JTextField("Value",15);
+        key = new JTextField("NEW KEY", 15);
+        value = new JTextField("NEW VALUE",15);
 
         panel1.add(key);
         panel1.add(value);
@@ -71,6 +71,10 @@ public class Client extends AbstractVerticle implements ActionListener{
         subButton = new JButton("Send Entry");
         subButton.addActionListener(this);
         panel2.add(subButton);
+        
+        clearButton = new JButton("Clear Tabley");
+        clearButton.addActionListener(this);
+        panel2.add(clearButton);
         
         searchButton = new JButton("Search");
         searchButton.addActionListener(this);
@@ -95,9 +99,14 @@ public class Client extends AbstractVerticle implements ActionListener{
     	if(ae.getSource() == this.subButton){
             System.out.println(key.getText() + " | " + value.getText());
             vertx.eventBus().publish("setKeyValue", key.getText() + ";" + value.getText());
+            key.setText("NEW KEY");
+            value.setText("NEW VALUE");
         }else if(ae.getSource() == this.searchButton){
-        	System.out.println("Search");
-        	vertx.eventBus().publish("getValue", key.getText());
+        	System.out.println("Search: " + search.getText());
+        	vertx.eventBus().publish("getValue", search.getText());
+        }else if(ae.getSource() == this.clearButton){
+        	System.out.println("Clear");
+        	vertx.eventBus().publish("clearTable", search.getText());
         }
     	
     }
